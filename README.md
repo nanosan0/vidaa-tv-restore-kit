@@ -28,9 +28,12 @@
 ### 第 0 步：拿到文件
 
 ```bash
-git clone https://github.com/<你的用户名>/vidaa-tv-restore-kit.git
+git clone https://github.com/nanosan0/vidaa-tv-restore-kit.git
 cd vidaa-tv-restore-kit
 ```
+
+> 不想装 git 也行：去 [Releases](https://github.com/nanosan0/vidaa-tv-restore-kit/releases)
+> 下载 `TV-Restore-Kit-VIDAA-20261026.zip`（完整离线包，自带 adb），解压双击 `恢复.bat` 即可。
 
 然后到仓库的 **Releases** 页面下载 `apks.zip`（约 240 MB，6 个第三方应用），解压到仓库的 `apks/` 目录：
 
