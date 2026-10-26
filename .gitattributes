@@ -1,0 +1,11 @@
+* text=auto eol=lf
+
+# Windows 脚本用 CRLF，否则 cmd 解析标签/续行会出问题
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# 二进制
+*.apk binary
+*.png binary
+*.zip binary

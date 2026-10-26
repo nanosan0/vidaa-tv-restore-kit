@@ -1,0 +1,22 @@
+# ---- 大体积二进制：第三方应用 APK 不入库，放在 Releases 的 apks.zip 里 ----
+apks/*.apk
+apks.zip
+
+# ---- 完整离线包 / 备份产物 ----
+*.zip
+TV-Restore-Kit-*.zip
+
+# ---- adb 自动下载目录（各平台自行下载）----
+platform-tools/
+
+# ---- 脚本运行产物 ----
+*.log
+tmp/
+logs/
+shots/
+*.png
+
+# ---- 系统垃圾 ----
+Thumbs.db
+desktop.ini
+.DS_Store

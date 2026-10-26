@@ -1,0 +1,9 @@
+      host_connected=false
+Transports: ETHERNET
+Transports: CELLULAR
+Transports: CELLULAR
+Transports: VPN
+Transports: VPN
+Transports: VPN
+Transports: VPN
+Transports: VPN

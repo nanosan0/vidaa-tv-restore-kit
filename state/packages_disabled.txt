@@ -1,0 +1,41 @@
+# Packages the restore script disables after a factory reset. One per line.
+# Lines starting with # are ignored. Keep this file pure ASCII: Windows PowerShell 5.1
+# mis-decodes UTF-8 without a BOM and can swallow a line break, dropping the next package.
+#
+# com.android.bluetooth is left out on purpose: the firmware ships it disabled and the
+# shell cannot change its state, so it stays disabled by itself.
+#
+# The script keeps a built-in protect list for core packages (systemui, shell, phone,
+# settings, permission controller, package installer, providers, overlays, android) and
+# skips them even if listed here, so a bad line cannot brick the TV.
+#
+# See docs/debloat-list.md for the Chinese explanation of every package below.
+app.orchard.tv
+com.android.printspooler
+com.bajintech.karaok
+com.hisense.autotest
+com.hisense.business.ad
+com.hisense.childlock
+com.hisense.demonstrate
+com.hisense.electronictutorial
+com.hisense.hitv.das
+com.hisense.horizontalassistantmenu
+com.hisense.hotelmenu
+com.hisense.logupload
+com.hisense.prism
+com.hisense.service.ad
+com.hisense.service.hproxy
+com.hisense.service.message
+com.hisense.smartimages
+com.hisense.tv.aivirtualassistant
+com.hisense.tv.familyalbum
+com.hisense.tv.videochat
+com.hisense.vidaaassistant
+com.hisense.voicecontrol
+com.hispeech.ai.area
+com.intelligent.speech
+com.jamdeo.android.avatarresources
+com.jamdeo.screensaver
+com.keylab.speech.core.vidaa
+com.keylab.speech.view.vidaa
+com.speech.enchatroom

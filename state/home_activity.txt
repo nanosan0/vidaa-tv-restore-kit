@@ -1,0 +1,27 @@
+priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+ActivityInfo:
+  name=com.gathin.tvhome.MainActivity
+  packageName=com.gathin.tvhome
+  enabled=true exported=true directBootAware=false
+  taskAffinity=com.gathin.tvhome targetActivity=null persistableMode=PERSIST_ROOT_ONLY
+  launchMode=2 flags=0x234 theme=0x0
+  screenOrientation=0 configChanges=0x6b3 softInputMode=0x0
+  lockTaskLaunchMode=LOCK_TASK_LAUNCH_MODE_DEFAULT
+  resizeMode=RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION
+  ApplicationInfo:
+    packageName=com.gathin.tvhome
+    labelRes=0x7f100005 nonLocalizedLabel=null icon=0x7f0d0000 banner=0x7f070000
+    processName=com.gathin.tvhome
+    taskAffinity=com.gathin.tvhome
+    uid=10040 flags=0x20883e46 privateFlags=0x1100 theme=0x7f110007
+    requiresSmallestWidthDp=0 compatibleWidthLimitDp=0 largestWidthLimitDp=0
+    sourceDir=/data/app/com.gathin.tvhome-FjSa956rT4dCXlkGwIaCLA==/base.apk
+    seinfo=default:targetSdkVersion=34
+    seinfoUser=:complete
+    dataDir=/data/user/0/com.gathin.tvhome
+    deviceProtectedDataDir=/data/user_de/0/com.gathin.tvhome
+    credentialProtectedDataDir=/data/user/0/com.gathin.tvhome
+    enabled=true minSdkVersion=26 targetSdkVersion=34 versionCode=8 targetSandboxVersion=1
+    supportsRtl=false
+    fullBackupContent=true
+    HiddenApiEnforcementPolicy=2

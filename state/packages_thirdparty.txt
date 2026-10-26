@@ -1,0 +1,13 @@
+app.orchard.tv
+com.gathin.tvhome
+com.github.tvbox.osc.tk
+com.gitv.dvb.live.shaanxi
+com.hisen.android.tv
+com.hisense.business.ad
+com.hisense.service.hproxy
+com.hisense.tv.familyalbum
+com.intelligent.speech
+com.speech.enchatroom
+com.ugreen.nasprotv
+com.xiaodianshi.tv.yst
+com.zb.test
