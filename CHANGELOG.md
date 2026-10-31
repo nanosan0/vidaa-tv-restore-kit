@@ -1,5 +1,16 @@
 # 更新记录
 
+## v1.0.1 — 2026-10-31
+
+文档补充，脚本与配置无改动。
+
+- 新增 FAQ「重启后停在聚好看，按 Home 回不来」：聚好看同为 HOME 类应用，开机自启后会占据
+  home task，此时 Home 键是空操作。默认 Home 设置仍是 `com.gathin.tvhome`，
+  `am force-stop com.jamdeo.tv.vod` 后按一次 Home 即恢复
+- 记录开机抢占的竞态规律：同一天两次重启，一次被 `com.zb.test` 抢前台（按 Home 即回），
+  一次被聚好看占 home task（需 force-stop）。两者都不影响 Home 设置本身
+- 新增「想看某个应用是不是抢了前台」排查段（`mHomeProcess` 判据）
+
 ## v1.0.0 — 2026-10-26
 
 首个版本，基于一台实机 `hisense VIDAA_TV`（MTK9632 / Android 9 / SDK 28）从零做完的完整备份。

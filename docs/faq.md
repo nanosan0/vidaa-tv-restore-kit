@@ -1,6 +1,55 @@
 # 常见问题
 
+## 重启后停在聚好看，按 Home 回不来
+
+**现象**：开机后 `dumpsys activity activities | grep mResumedActivity` 是
+`com.jamdeo.tv.vod/com.ju.main.launcher.LauncherActivity`，按 Home 键**画面没有任何变化**。
+
+**原因**：聚好看自己也声明了 `android.intent.category.HOME`（它是 `com.ju.main.launcher.LauncherActivity`），
+开机自启后占据了 home task。这种状态下系统认为「已经在家」，Home 键是空操作。
+
+此时默认 Home 设置**并没有被改掉**：
+
+```bash
+adb shell cmd package resolve-activity -a android.intent.action.MAIN -c android.intent.category.HOME
+# packageName=com.gathin.tvhome   isDefault=true      ← 仍然正确
+```
+
+**处理**：结束聚好看再按 Home，一次就够。
+
+```bash
+adb shell am force-stop com.jamdeo.tv.vod
+adb shell input keyevent KEYCODE_HOME
+```
+
+**为什么不能用 `pm disable-user` 一劳永逸**：聚好看承载遥控器「信号源」键的 HDMI / AV / 直播面板
+（见 [device-info.md](device-info.md)），禁掉信号源入口就没了。只能靠上面这条命令应急。
+
+**这是开机竞态，不是每次都会发生。** 实测同一天两次重启：
+
+| 开机 | 抢前台的包 | 处理 |
+|---|---|---|
+| 第 1 次 | `com.zb.test`（`PlayerActivity`） | 按一次 Home 即回桌面 |
+| 第 2 次 | `com.jamdeo.tv.vod`（占据 home task） | 必须 `am force-stop` 再按 Home |
+
+重启几次之后如果嫌烦，可以固定用一条命令兜底：
+
+```bash
+adb shell "am force-stop com.jamdeo.tv.vod; am force-stop com.zb.test"; adb shell input keyevent KEYCODE_HOME
+```
+
+## 想看某个应用是不是抢了前台
+
+```bash
+adb shell dumpsys activity activities | grep -E "mResumedActivity|mFocusedActivity"
+adb shell dumpsys activity activities | grep -A2 "mHomeProcess"
+```
+
+`mHomeProcess` 是系统认定的「家」进程 —— 它如果不是 `com.gathin.tvhome`，说明 home task 被别的 HOME 应用占了，
+用上面的 `am force-stop` 处理。
+
 ## 连不上电视
+
 
 先按这个顺序排查，90% 是前两条：
 

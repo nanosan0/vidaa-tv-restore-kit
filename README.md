@@ -306,6 +306,7 @@ vidaa-tv-restore-kit/
 |---|---|
 | `device not found` / 连接超时 | [docs/faq.md#连不上电视](docs/faq.md) |
 | 按 Home 还是回聚好看 | [docs/faq.md#home-键没接管](docs/faq.md) |
+| 重启后停在聚好看、按 Home 没反应 | [docs/faq.md#重启后停在聚好看按-home-回不来](docs/faq.md)（`am force-stop com.jamdeo.tv.vod` 即可） |
 | `INSTALL_FAILED_UPDATE_INCOMPATIBLE` | 签名不同，先 `adb uninstall <包名>` 再装 |
 | 装完网络直播自己跳到播放页 | 正常，按一次 Home 就回桌面 |
 | 想改底栏 / 网格里的应用 | 改 `config/config.xml` 后重新构建：[docs/build-launcher.md](docs/build-launcher.md) |
