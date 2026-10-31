@@ -1,5 +1,19 @@
 # 更新记录
 
+## v1.0.2 — 2026-10-31
+
+订正「重启后停在聚好看」的根因（v1.0.1 的描述不准确）。
+
+- 真正的根因是**海信在 AMS 里的开机首启白名单补丁**：`initAppWhiteList` 从
+  `/data/local/misc/app_start_when_boot_whitelist.txt` 读名单，`com.jamdeo.tv.vod` 在名单内，
+  开机时 `getHomes` 只返回它，由 uid 0 用 HOME 意图拉起 —— 用户偏好（`set-home-activity`）在这一步不参与
+- 叠加原因一：聚好看 `LauncherActivity` 同时声明 `LAUNCHER` + `HOME`，一被拉起就合法占据 home task
+- 叠加原因二：开机初期 `PhoneWindowManager` 因 `user setup is in progress` 丢弃 HOME 键，按键完全无效
+- 修正处理方式：只需 `am force-stop com.jamdeo.tv.vod`（结束 home 应用迫使 AMS 重新解析 Home），
+  不必再额外按 Home
+- 补充白名单文件权限实测：目录 0777 可写，但文件 `system:system 0600`，shell 读不出改不了；
+  `mv` 改名会让 AMS 回落内置默认名单，不建议
+
 ## v1.0.1 — 2026-10-31
 
 文档补充，脚本与配置无改动。

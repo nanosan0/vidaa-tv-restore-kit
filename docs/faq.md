@@ -5,38 +5,83 @@
 **现象**：开机后 `dumpsys activity activities | grep mResumedActivity` 是
 `com.jamdeo.tv.vod/com.ju.main.launcher.LauncherActivity`，按 Home 键**画面没有任何变化**。
 
-**原因**：聚好看自己也声明了 `android.intent.category.HOME`（它是 `com.ju.main.launcher.LauncherActivity`），
-开机自启后占据了 home task。这种状态下系统认为「已经在家」，Home 键是空操作。
+**根因**（2026-10-31 用 `logcat -b system` 定位，三层叠加）：
 
-此时默认 Home 设置**并没有被改掉**：
+### 1. 海信在 AMS 里做了「开机首启白名单」，首屏被写死为聚好看
 
-```bash
-adb shell cmd package resolve-activity -a android.intent.action.MAIN -c android.intent.category.HOME
-# packageName=com.gathin.tvhome   isDefault=true      ← 仍然正确
+开机瞬间的系统日志（时钟还没同步，所以时间戳是 `01-01 08:00:15`）：
+
+```
+initAppWhiteList, read list from [/data/local/misc/app_start_when_boot_whitelist.txt]
+initAppWhiteList, App first white list for booting: com.jamdeo.tv.vod
+getHomes:com.jamdeo.tv.vod
+START u0 {act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10000100
+          cmp=com.jamdeo.tv.vod/com.ju.main.launcher.LauncherActivity} from uid 0
+startProcessLocked, [com.jamdeo.tv.vod] is in app first white list, can start directly, currentPhase:600
 ```
 
-**处理**：结束聚好看再按 Home，一次就够。
+`initAppWhiteList` / `getHomes:` 都不是 AOSP 原生日志，是海信加的。关键在 `getHomes:com.jamdeo.tv.vod` ——
+开机时系统的 home 候选列表里**只有聚好看一个**，然后由 uid 0（system）用 HOME 意图把它拉起。
+
+也就是说：`cmd package set-home-activity` 记下的用户偏好，在「开机首屏」这一步不参与竞争。
+它只在开机之后重新解析 Home 时才生效。
+
+### 2. 聚好看的 LauncherActivity 同时声明了 LAUNCHER 和 HOME
+
+```
+306c1aa com.jamdeo.tv.vod/com.ju.main.launcher.LauncherActivity filter 5929cce
+  Action:    "android.intent.action.MAIN"
+  Category:  "android.intent.category.DEFAULT"
+  Category:  "android.intent.category.LAUNCHER"
+  Category:  "android.intent.category.HOME"      ← 它本身就是合法桌面
+```
+
+所以它一被拉起就占据 home task，不是「普通应用跑到前台」，Home 键因此变成空操作。
+
+### 3. 刚开机那几分钟，WMS 还在丢弃 HOME 键
+
+```
+PhoneWindowManager: Not starting activity because user setup is in progress:
+  Intent { act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10200000 }
+```
+
+`mUserSetupComplete` 尚未置 1 时，HOME 键被 WindowManager 直接吞掉。所以开机后那几分钟**按键完全无效**，
+不是「按了但被聚好看吃掉」。
+
+### 为什么 `am force-stop` 有效
+
+结束当前占据 home task 的应用后，AMS 被迫**重新解析** Home，这次走正常路径，用户偏好生效：
+
+```
+START u0 {act=... cat=[android.intent.category.HOME] cmp=com.gathin.tvhome/.MainActivity} from uid 0
+```
 
 ```bash
 adb shell am force-stop com.jamdeo.tv.vod
-adb shell input keyevent KEYCODE_HOME
 ```
 
-**为什么不能用 `pm disable-user` 一劳永逸**：聚好看承载遥控器「信号源」键的 HDMI / AV / 直播面板
-（见 [device-info.md](device-info.md)），禁掉信号源入口就没了。只能靠上面这条命令应急。
+只需这一条；后面再按 Home 才会进入自制桌面。
 
-**这是开机竞态，不是每次都会发生。** 实测同一天两次重启：
-
-| 开机 | 抢前台的包 | 处理 |
-|---|---|---|
-| 第 1 次 | `com.zb.test`（`PlayerActivity`） | 按一次 Home 即回桌面 |
-| 第 2 次 | `com.jamdeo.tv.vod`（占据 home task） | 必须 `am force-stop` 再按 Home |
-
-重启几次之后如果嫌烦，可以固定用一条命令兜底：
+### 白名单文件能不能改掉
 
 ```bash
-adb shell "am force-stop com.jamdeo.tv.vod; am force-stop com.zb.test"; adb shell input keyevent KEYCODE_HOME
+ls -ld /data/local/misc                      # drwxrwxrwx shell shell
+ls -l  /data/local/misc/app_start_when_boot_whitelist.txt   # -rw------- system system 557
 ```
+
+目录是 0777（shell 可写），但白名单文件本身 `system:system` + `0600`，**shell 读不出内容也改不了**。
+唯一能做的是 `mv` 改名让它读不到 —— 但 AMS 大概率回落到编译进固件的默认名单（推测仍含聚好看），
+未验证，会拿开机稳定性做赌注，不建议。
+
+**能用 `pm disable-user` 一劳永逸吗**：不能。聚好看承载遥控器「信号源」键的 HDMI / AV / 直播面板
+（见 [device-info.md](device-info.md)），禁掉信号源入口就没了。
+
+### 结论
+
+- 这是**固件行为**，`set-home-activity` 改不掉，不是安装脚本的 bug
+- 每次开机后跑一次 `am force-stop com.jamdeo.tv.vod` 即可（零风险，实测有效）
+- 开机抢占是竞态：`com.zb.test` 也会用 `AutoStartReceiver` 抢前台，但它不是 HOME 类应用，
+  按一次 Home 就能回
 
 ## 想看某个应用是不是抢了前台
 
